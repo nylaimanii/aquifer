@@ -78,6 +78,17 @@ export interface DailyEntry {
   stage: GrowthStage;
 }
 
+/** Today's weather snapshot + short forecast, fed into the recommender. */
+export interface Weather {
+  /** ISO 8601 date (YYYY-MM-DD). */
+  todayDate: string;
+  todayEt0Mm: number;
+  todayRainfallMm: number;
+  forecastRainNext3DaysMm: number;
+  /** ISO 8601 datetime the snapshot was fetched. */
+  fetchedAt: string;
+}
+
 /** Inputs to a single day's soil-water-balance step. */
 export interface SoilBalanceInput {
   moistureBeforeMm: number;
