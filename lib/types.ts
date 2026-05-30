@@ -89,6 +89,42 @@ export interface Weather {
   fetchedAt: string;
 }
 
+/** One day of weather, with ET₀ computed both by us and by Open-Meteo. */
+export interface DailyWeather {
+  /** 'YYYY-MM-DD' (local timezone of the location). */
+  date: string;
+  tMaxC: number;
+  tMinC: number;
+  rhMaxPct: number;
+  rhMinPct: number;
+  /** Mean 10 m wind speed, m/s (the FAO-56 ET₀ input). */
+  windSpeedMs: number;
+  solarRadiationMjPerM2Day: number;
+  rainfallMm: number;
+  /** ET₀ we computed via lib/penman-monteith, mm. */
+  et0OurMm: number;
+  /** Open-Meteo's own FAO ET₀, mm — a sanity reference. */
+  et0OpenMeteoMm: number;
+  /** Day of year, 1–366. */
+  dayOfYear: number;
+}
+
+/** Full weather payload returned by /api/weather. */
+export interface WeatherPayload {
+  latitude: number;
+  longitude: number;
+  elevationM: number;
+  timezone: string;
+  /** ISO datetime the data was fetched. */
+  fetchedAt: string;
+  /** The entry for "today" in the location's timezone. */
+  today: DailyWeather;
+  /** 7-day window starting today (inclusive). */
+  forecast: DailyWeather[];
+  /** Sum of precipitation for the next 3 days (tomorrow + 2), mm. */
+  forecastRainNext3DaysMm: number;
+}
+
 /** Inputs to a single day's soil-water-balance step. */
 export interface SoilBalanceInput {
   moistureBeforeMm: number;
