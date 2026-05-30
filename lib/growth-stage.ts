@@ -29,6 +29,35 @@ export function getStage(
   return "late-season";
 }
 
+/**
+ * Current crop coefficient Kc, with FAO-56 linear interpolation across the
+ * development (initial→mid) and late-season (mid→end) ramps. Flat at kc.initial
+ * during the initial stage, flat at kc.mid through mid-season, and clamped at
+ * kc.end once the season is over.
+ */
+export function currentKc(
+  plantDate: string,
+  today: string,
+  crop: Crop,
+): number {
+  const day = daysSincePlanting(plantDate, today);
+  const { initial: lIni, development: lDev, mid: lMid, late: lLate } =
+    crop.stageLengthsDays;
+  const { initial: kcIni, mid: kcMid, end: kcEnd } = crop.kc;
+
+  if (day < lIni) return kcIni;
+  if (day < lIni + lDev) {
+    const frac = (day - lIni) / lDev;
+    return kcIni + frac * (kcMid - kcIni);
+  }
+  if (day < lIni + lDev + lMid) return kcMid;
+  if (day < lIni + lDev + lMid + lLate) {
+    const frac = (day - (lIni + lDev + lMid)) / lLate;
+    return kcMid + frac * (kcEnd - kcMid);
+  }
+  return kcEnd;
+}
+
 // --- unit-style asserts (run: npx tsx lib/growth-stage.ts) ---
 if (require.main === module) {
   const addDays = (iso: string, n: number): string =>
@@ -57,5 +86,19 @@ if (require.main === module) {
       `FAIL: corn day ${day} expected ${expected}, got ${got}`,
     );
     console.log(`${got === expected ? "✓" : "✗"} corn day ${day} → ${got}`);
+  }
+
+  const close = (a: number, b: number, tol: number): boolean =>
+    Math.abs(a - b) <= tol;
+  const kcCases: Array<[number, number, string]> = [
+    [10, 0.3, "day 10 = kc_ini"],
+    [50, 0.3 + (20 / 40) * (1.2 - 0.3), "day 50 mid-dev ramp"],
+    [90, 1.2, "day 90 = kc_mid"],
+  ];
+  for (const [day, expected, label] of kcCases) {
+    const got = currentKc(PLANT, addDays(PLANT, day), corn);
+    const ok = close(got, expected, 0.01);
+    console.assert(ok, `FAIL: corn Kc ${label} expected ${expected}, got ${got}`);
+    console.log(`${ok ? "✓" : "✗"} corn Kc ${label} → ${got.toFixed(3)}`);
   }
 }
