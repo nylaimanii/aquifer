@@ -78,6 +78,30 @@ export interface DailyEntry {
   stage: GrowthStage;
 }
 
+/** Inputs to a single day's soil-water-balance step. */
+export interface SoilBalanceInput {
+  moistureBeforeMm: number;
+  /** Total available water in the root zone, mm. */
+  tawMm: number;
+  /** Readily available water (depletion below this triggers stress), mm. */
+  rawMm: number;
+  et0Mm: number;
+  kc: number;
+  rainfallMm: number;
+  irrigationMm: number;
+}
+
+/** Result of a single day's soil-water-balance step. */
+export interface SoilBalanceResult {
+  moistureAfterMm: number;
+  depletionBeforeMm: number;
+  etcPotentialMm: number;
+  etcActualMm: number;
+  ksStressFactor: number;
+  runoffMm: number;
+  isStressed: boolean;
+}
+
 /** Today's irrigation recommendation, derived from current state. */
 export interface Recommendation {
   /** ISO 8601 date the recommendation is for. */
