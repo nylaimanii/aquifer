@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { MapPicker } from "./MapPicker";
 import { CropPicker } from "./CropPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,20 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useFarmStore } from "@/state/farm-store";
 import type { CropId, Farm, FetchStatus } from "@/lib/types";
+
+// mapbox-gl is CJS and crashes during Turbopack SSR-shell evaluation
+// ("module is not defined"). Load it browser-only in its own chunk.
+const MapPicker = dynamic(
+  () => import("./MapPicker").then((m) => m.MapPicker),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[400px] w-full items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-500 dark:bg-slate-800">
+        Loading map…
+      </div>
+    ),
+  },
+);
 
 const ACCENT = "bg-[#1E7A9B] hover:bg-[#1A6B88] text-white";
 
