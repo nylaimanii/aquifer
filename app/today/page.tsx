@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFarmStore } from "@/state/farm-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,9 +27,16 @@ function StatusPill({ label, status }: { label: string; status: FetchStatus }) {
 }
 
 export default function TodayPage() {
+  const router = useRouter();
   const farm = useFarmStore((s) => s.farm);
   const weatherStatus = useFarmStore((s) => s.weatherStatus);
   const soilStatus = useFarmStore((s) => s.soilStatus);
+
+  function handleClear() {
+    if (!window.confirm("Clear this farm and start over?")) return;
+    useFarmStore.getState().clearFarm();
+    router.push("/setup");
+  }
 
   if (!farm) {
     return (
@@ -65,13 +73,12 @@ export default function TodayPage() {
         <p className="text-muted-foreground text-sm italic">
           real today view coming in step 14
         </p>
-        <Button
-          variant="outline"
-          className="w-fit"
-          render={<Link href="/setup" />}
-        >
-          Change farm
-        </Button>
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          <Button render={<Link href="/setup" />}>Change farm</Button>
+          <Button variant="destructive" onClick={handleClear}>
+            Clear farm
+          </Button>
+        </div>
       </Card>
     </main>
   );

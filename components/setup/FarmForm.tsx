@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { MapPicker } from "./MapPicker";
 import { CropPicker } from "./CropPicker";
 import { Button } from "@/components/ui/button";
@@ -42,11 +43,16 @@ export function FarmForm() {
   const weatherStatus = useFarmStore((s) => s.weatherStatus);
   const soilStatus = useFarmStore((s) => s.soilStatus);
 
-  const [lat, setLat] = useState<number | null>(null);
-  const [lon, setLon] = useState<number | null>(null);
-  const [crop, setCrop] = useState<CropId | undefined>(undefined);
-  const [plantDate, setPlantDate] = useState<string>("");
-  const [areaAcres, setAreaAcres] = useState<string>("");
+  // seed form state from an existing farm (read once on mount)
+  const [existing] = useState(() => useFarmStore.getState().farm);
+
+  const [lat, setLat] = useState<number | null>(existing?.latitude ?? null);
+  const [lon, setLon] = useState<number | null>(existing?.longitude ?? null);
+  const [crop, setCrop] = useState<CropId | undefined>(existing?.crop);
+  const [plantDate, setPlantDate] = useState<string>(existing?.plantDate ?? "");
+  const [areaAcres, setAreaAcres] = useState<string>(
+    existing ? String(existing.areaAcres) : "",
+  );
 
   const area = parseFloat(areaAcres);
   const ready =
@@ -70,14 +76,30 @@ export function FarmForm() {
       soil: null, // filled by fetchSoil
     };
     useFarmStore.getState().setFarm(farm);
+    toast.success("Farm saved", {
+      description: "Pulling soil + weather for your coordinates...",
+    });
     router.push("/today");
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">
+          {existing ? "Update farm" : "Set up your farm"}
+        </h1>
+        <p className="text-muted-foreground mt-2 max-w-xl">
+          Drop a pin where your field is. We&apos;ll pull weather and soil
+          underneath the pin.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
       {/* Map — left 2/3 on md+ */}
       <div className="flex min-h-[400px] flex-col md:col-span-2">
         <MapPicker
+          initialLat={existing?.latitude}
+          initialLon={existing?.longitude}
           onSelect={(la, lo) => {
             setLat(la);
             setLon(lo);
@@ -133,6 +155,7 @@ export function FarmForm() {
           <StatusPill label="Soil" status={soilStatus} />
         </div>
       </Card>
+      </div>
     </div>
   );
 }

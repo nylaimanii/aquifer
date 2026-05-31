@@ -13,17 +13,22 @@ interface MapPickerProps {
   onSelect: (lat: number, lon: number) => void;
 }
 
-export function MapPicker({
-  initialLat = 41.7,
-  initialLon = -93.9,
-  onSelect,
-}: MapPickerProps) {
+// default map center (canonical iowa point) when no pin is supplied
+const DEFAULT_CENTER: [number, number] = [-93.9, 41.7];
+
+export function MapPicker({ initialLat, initialLon, onSelect }: MapPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   // keep the latest onSelect without re-initializing the map
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+
+  // an existing pin is supplied only when both coords are present
+  const hasInitialPin = initialLat !== undefined && initialLon !== undefined;
+  const center: [number, number] = hasInitialPin
+    ? [initialLon, initialLat]
+    : DEFAULT_CENTER;
 
   useEffect(() => {
     if (!TOKEN || !containerRef.current) return;
@@ -32,10 +37,17 @@ export function MapPicker({
     const map = new mapboxgl.Map({
       container: containerRef.current,
       style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: [initialLon, initialLat],
-      zoom: 6,
+      center,
+      zoom: hasInitialPin ? 10 : 6,
     });
     mapRef.current = map;
+
+    // pre-drop a marker if editing an existing farm
+    if (hasInitialPin) {
+      markerRef.current = new mapboxgl.Marker({ color: ACCENT })
+        .setLngLat(center)
+        .addTo(map);
+    }
 
     map.on("click", (e) => {
       const { lng, lat } = e.lngLat;
