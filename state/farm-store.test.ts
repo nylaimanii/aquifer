@@ -4,7 +4,7 @@
  */
 
 import { useFarmStore } from "./farm-store";
-import type { Farm } from "@/lib/types";
+import type { Farm, WeatherPayload, DailyWeather } from "@/lib/types";
 
 const check = (label: string, ok: boolean, detail?: string) =>
   console.log(`${ok ? "✓" : "✗"} ${label}${detail ? ` — ${detail}` : ""}`);
@@ -26,13 +26,31 @@ const FARM: Farm = {
   areaAcres: 100,
   soil: SOIL,
 };
-const WEATHER = (date: string, et0 = 6, rain = 0, fc3 = 0) => ({
-  todayDate: date,
-  todayEt0Mm: et0,
-  todayRainfallMm: rain,
-  forecastRainNext3DaysMm: fc3,
-  fetchedAt: new Date().toISOString(),
-});
+const WEATHER = (date: string, et0 = 6, rain = 0, fc3 = 0): WeatherPayload => {
+  const today: DailyWeather = {
+    date,
+    tMaxC: 28,
+    tMinC: 16,
+    rhMaxPct: 80,
+    rhMinPct: 40,
+    windSpeedMs: 3,
+    solarRadiationMjPerM2Day: 25,
+    rainfallMm: rain,
+    et0OurMm: et0,
+    et0OpenMeteoMm: et0,
+    dayOfYear: 1,
+  };
+  return {
+    latitude: 41.7,
+    longitude: -93.9,
+    elevationM: 300,
+    timezone: "America/Chicago",
+    fetchedAt: new Date().toISOString(),
+    today,
+    forecast: [today],
+    forecastRainNext3DaysMm: fc3,
+  };
+};
 const addDays = (iso: string, n: number) =>
   new Date(Date.parse(iso) + n * 86_400_000).toISOString().slice(0, 10);
 

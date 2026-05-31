@@ -92,16 +92,8 @@ export interface SoilResponse {
   fetchedAt: string;
 }
 
-/** Today's weather snapshot + short forecast, fed into the recommender. */
-export interface Weather {
-  /** ISO 8601 date (YYYY-MM-DD). */
-  todayDate: string;
-  todayEt0Mm: number;
-  todayRainfallMm: number;
-  forecastRainNext3DaysMm: number;
-  /** ISO 8601 datetime the snapshot was fetched. */
-  fetchedAt: string;
-}
+/** Status of an upstream data fetch (weather, soil). */
+export type FetchStatus = "idle" | "loading" | "ready" | "error";
 
 /** One day of weather, with ET₀ computed both by us and by Open-Meteo. */
 export interface DailyWeather {
