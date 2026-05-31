@@ -78,6 +78,20 @@ export interface DailyEntry {
   stage: GrowthStage;
 }
 
+/** Soil profile returned by /api/soil (SoilProfile fields + texture breakdown). */
+export interface SoilResponse {
+  latitude: number;
+  longitude: number;
+  textureClass: string;
+  sandPct: number;
+  siltPct: number;
+  clayPct: number;
+  fieldCapacityMmPerM: number;
+  wiltingPointMmPerM: number;
+  /** ISO datetime the data was fetched. */
+  fetchedAt: string;
+}
+
 /** Today's weather snapshot + short forecast, fed into the recommender. */
 export interface Weather {
   /** ISO 8601 date (YYYY-MM-DD). */
