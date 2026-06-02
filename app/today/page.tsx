@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RecommendationCard } from "@/components/today/RecommendationCard";
 import { SoilMoistureGauge } from "@/components/today/SoilMoistureGauge";
+import { ForecastStrip } from "@/components/today/ForecastStrip";
 import { StatusPills } from "@/components/today/StatusPills";
 
 const ACCENT = "bg-[#1E7A9B] hover:bg-[#1A6B88] text-white";
@@ -92,6 +93,9 @@ export default function TodayPage() {
           isLoading={!recommendation && !hasError}
         />
       </div>
+
+      {/* 7-day forecast */}
+      <ForecastStrip forecast={weather?.forecast} />
 
       {/* status pills */}
       <div className="mt-6">
