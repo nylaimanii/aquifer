@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { RecommendationCard } from "@/components/today/RecommendationCard";
 import { SoilMoistureGauge } from "@/components/today/SoilMoistureGauge";
 import { ForecastStrip } from "@/components/today/ForecastStrip";
+import { LogIrrigationDialog } from "@/components/today/LogIrrigationDialog";
 import { StatusPills } from "@/components/today/StatusPills";
 
 const ACCENT = "bg-[#1E7A9B] hover:bg-[#1A6B88] text-white";
@@ -80,7 +81,10 @@ export default function TodayPage() {
             </Button>
           </Card>
         ) : recommendation ? (
-          <RecommendationCard rec={recommendation} et0Today={et0Today} />
+          <div className="flex flex-col gap-4">
+            <RecommendationCard rec={recommendation} et0Today={et0Today} />
+            <LogIrrigationDialog />
+          </div>
         ) : (
           <Card className="flex min-h-[260px] items-center justify-center p-8">
             <p className="text-sm text-slate-500">Computing…</p>
