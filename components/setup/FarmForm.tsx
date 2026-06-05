@@ -80,14 +80,15 @@ export function FarmForm() {
   function handleSave() {
     if (!ready || lat === null || lon === null || crop === undefined) return;
     const farm: Farm = {
-      id: crypto.randomUUID(),
+      // reuse id when editing so history is preserved; new id = fresh farm
+      id: existing?.id ?? crypto.randomUUID(),
       name: `Farm at ${lat.toFixed(2)}, ${lon.toFixed(2)}`,
       crop,
       plantDate,
       latitude: lat,
       longitude: lon,
       areaAcres: area,
-      soil: null, // filled by fetchSoil
+      soil: existing?.soil ?? null, // refreshed by fetchSoil
     };
     useFarmStore.getState().setFarm(farm);
     toast.success("Farm saved", {

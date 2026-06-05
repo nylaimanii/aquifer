@@ -118,9 +118,13 @@ export const useFarmStore = create<FarmState>()(
       soilError: null,
 
       setFarm: (farm) => {
+        // Preserve history when editing the same farm (same id); reset only
+        // for a genuinely new farm.
+        const prevFarm = get().farm;
+        const isSameFarm = prevFarm?.id === farm.id;
         set({
           farm,
-          history: [],
+          history: isSameFarm ? get().history : [],
           recommendation: null,
           weather: null,
           weatherStatus: "idle",

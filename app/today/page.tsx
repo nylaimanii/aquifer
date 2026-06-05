@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFarmStore } from "@/state/farm-store";
+import { shortDate } from "@/lib/format-date";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RecommendationCard } from "@/components/today/RecommendationCard";
@@ -20,6 +22,17 @@ export default function TodayPage() {
   const recommendation = useFarmStore((s) => s.recommendation);
   const weatherStatus = useFarmStore((s) => s.weatherStatus);
   const soilStatus = useFarmStore((s) => s.soilStatus);
+  const fetchAll = useFarmStore((s) => s.fetchAll);
+
+  // After persist rehydration the farm appears post-mount; if statuses are
+  // still idle (or data was dropped on reload), kick the fetches. fetchAll
+  // flips statuses to 'loading' synchronously, so this won't loop.
+  useEffect(() => {
+    if (!farm) return;
+    if (weatherStatus === "idle" || soilStatus === "idle") {
+      fetchAll();
+    }
+  }, [farm, weatherStatus, soilStatus, fetchAll]);
 
   function handleClear() {
     if (!window.confirm("Clear this farm and start over?")) return;
@@ -49,7 +62,9 @@ export default function TodayPage() {
           <div className="flex items-baseline gap-3">
             <h1 className="text-3xl font-bold tracking-tight">Today</h1>
             {weather?.today.date && (
-              <span className="text-sm text-slate-500">{weather.today.date}</span>
+              <span className="text-sm text-slate-500">
+                {shortDate(weather.today.date)}
+              </span>
             )}
           </div>
           <p className="mt-1 text-sm text-slate-500">{farm.name}</p>

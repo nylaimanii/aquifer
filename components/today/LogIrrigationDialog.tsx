@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFarmStore } from "@/state/farm-store";
+import { shortDate } from "@/lib/format-date";
 
 const ACCENT = "bg-[#1E7A9B] hover:bg-[#1A6B88] text-white";
 const MAX_MM = 200;
@@ -48,9 +49,7 @@ export function LogIrrigationDialog() {
   }
 
   const lastLabel = lastIrrigation
-    ? `Last irrigation: ${lastIrrigation.irrigationMm} mm on ${new Date(
-        lastIrrigation.date,
-      ).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+    ? `Last irrigation: ${lastIrrigation.irrigationMm} mm on ${shortDate(lastIrrigation.date)}`
     : "No irrigation logged yet.";
 
   return (

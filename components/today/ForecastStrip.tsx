@@ -2,6 +2,7 @@
 
 import { Droplet, CloudRain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { shortDate, weekdayLabel } from "@/lib/format-date";
 import type { DailyWeather } from "@/lib/types";
 
 interface ForecastStripProps {
@@ -10,24 +11,7 @@ interface ForecastStripProps {
 
 const ACCENT_RGB = "30, 122, 155"; // #1E7A9B
 
-// Parse 'YYYY-MM-DD' as UTC so the weekday/label never shifts by timezone.
-function utcDate(iso: string): Date {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d));
-}
-
-const weekdayFmt = new Intl.DateTimeFormat("en-US", {
-  weekday: "short",
-  timeZone: "UTC",
-});
-const monthDayFmt = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  timeZone: "UTC",
-});
-
 function ForecastTile({ day, index }: { day: DailyWeather; index: number }) {
-  const date = utcDate(day.date);
   const isToday = index === 0;
   const rain = Math.max(0, day.rainfallMm);
   // intensity caps at 20mm = full color
@@ -44,9 +28,9 @@ function ForecastTile({ day, index }: { day: DailyWeather; index: number }) {
     >
       <div>
         <div className="text-sm font-semibold">
-          {isToday ? "Today" : weekdayFmt.format(date)}
+          {weekdayLabel(day.date, isToday)}
         </div>
-        <div className="text-xs text-slate-500">{monthDayFmt.format(date)}</div>
+        <div className="text-xs text-slate-500">{shortDate(day.date)}</div>
       </div>
 
       <div className="flex flex-col gap-1 text-xs">
