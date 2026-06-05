@@ -5,6 +5,7 @@
 
 import fs from "fs";
 import { parseSoilGridsResponse, classifyTexture } from "./soil-fetch";
+import { GENERIC_SILT_LOAM_FALLBACK } from "./soil-fallback";
 
 const check = (label: string, ok: boolean, detail?: string) =>
   console.log(`${ok ? "✓" : "✗"} ${label}${detail ? ` — ${detail}` : ""}`);
@@ -50,3 +51,11 @@ check(
 check("classifier silt loam", classifyTexture(20, 60, 20) === "silt loam");
 check("classifier sand", classifyTexture(85, 10, 5) === "sand");
 check("classifier clay", classifyTexture(20, 30, 50) === "clay");
+
+// fallback shape (used by the route when SoilGrids is unreachable)
+check(
+  "fallback FC > WP",
+  GENERIC_SILT_LOAM_FALLBACK.fieldCapacityMmPerM >
+    GENERIC_SILT_LOAM_FALLBACK.wiltingPointMmPerM,
+);
+check("fallback flagged degraded", GENERIC_SILT_LOAM_FALLBACK.degraded === true);

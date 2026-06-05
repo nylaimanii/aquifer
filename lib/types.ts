@@ -48,6 +48,8 @@ export interface SoilProfile {
   wiltingPointMmPerM: number;
   latitude: number;
   longitude: number;
+  /** True when this is a generic fallback profile, not real SoilGrids data. */
+  degraded?: boolean;
 }
 
 /** A single field the farmer is tracking. */
@@ -90,6 +92,10 @@ export interface SoilResponse {
   wiltingPointMmPerM: number;
   /** ISO datetime the data was fetched. */
   fetchedAt: string;
+  /** True when a generic fallback profile was used (SoilGrids unavailable). */
+  degraded?: boolean;
+  /** Why the fallback was used, e.g. 'soilgrids 502', 'masked pixel'. */
+  degradedReason?: string;
 }
 
 /** Status of an upstream data fetch (weather, soil). */

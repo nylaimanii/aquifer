@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { fetchSoil } from "@/lib/soil-fetch";
+import { GENERIC_SILT_LOAM_FALLBACK } from "@/lib/soil-fallback";
+import type { SoilResponse } from "@/lib/types";
 
 // 24-hour cache — soil doesn't change.
 export const revalidate = 86400;
@@ -20,7 +22,16 @@ export async function GET(req: NextRequest) {
     const payload = await fetchSoil({ lat, lon });
     return Response.json(payload);
   } catch (e) {
-    console.error("[/api/soil]", e);
-    return Response.json({ error: "upstream failed" }, { status: 502 });
+    // SoilGrids 5xx / timeout / masked-pixel (parser throws) → graceful
+    // fallback so the recommendation still works, just less precisely tuned.
+    console.warn("[/api/soil] upstream failed, returning fallback", e);
+    const fallback: SoilResponse = {
+      latitude: lat,
+      longitude: lon,
+      ...GENERIC_SILT_LOAM_FALLBACK,
+      fetchedAt: new Date().toISOString(),
+      degradedReason: e instanceof Error ? e.message : "soilgrids unreachable",
+    };
+    return Response.json(fallback, { status: 200 });
   }
 }

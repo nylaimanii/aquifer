@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 interface SoilMoistureGaugeProps {
   pct: number;
   textureClass?: string;
+  degraded?: boolean;
   isLoading?: boolean;
 }
 
@@ -28,6 +29,7 @@ function fillArcPath(pct: number): string {
 export function SoilMoistureGauge({
   pct,
   textureClass,
+  degraded,
   isLoading,
 }: SoilMoistureGaugeProps) {
   if (isLoading) {
@@ -79,7 +81,10 @@ export function SoilMoistureGauge({
         </text>
       </svg>
       {textureClass && (
-        <p className="text-sm text-slate-500">soil: {textureClass}</p>
+        <p className="text-sm text-slate-500">
+          soil: {textureClass}
+          {degraded && !textureClass.includes("estimated") ? " (estimated)" : ""}
+        </p>
       )}
     </Card>
   );

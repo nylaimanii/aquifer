@@ -109,6 +109,7 @@ export default function TodayPage() {
         <SoilMoistureGauge
           pct={recommendation?.soilMoisturePct ?? 0}
           textureClass={farm.soil?.textureClass}
+          degraded={farm.soil?.degraded === true}
           isLoading={!recommendation && !hasError}
         />
       </div>

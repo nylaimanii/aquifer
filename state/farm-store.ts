@@ -211,6 +211,7 @@ export const useFarmStore = create<FarmState>()(
                     wiltingPointMmPerM: r.wiltingPointMmPerM,
                     latitude: r.latitude,
                     longitude: r.longitude,
+                    degraded: r.degraded ?? false,
                   },
                 }
               : s.farm,
